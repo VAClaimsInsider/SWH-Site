@@ -52,7 +52,7 @@ export default function About({ teamMembers, departments }: { teamMembers: ITeam
   )
 }
 
-export async function getStaticProps(context: any) {
+export async function getServerSideProps(context: any) {
   // Get all Team Members and list of Departments
   let { teamMembers, departments } = await client.fetch(`{
     "teamMembers": *[_type == "teamMember"] | order(orderRank) {
