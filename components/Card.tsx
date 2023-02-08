@@ -1,7 +1,11 @@
-import React from 'react'
-import styled from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 
-const Card = styled.div`
+interface ICard extends StyledComponentBase<any, {}> {
+    Image?: any;
+    Body?: any;
+}
+
+const Card: ICard = styled.div`
   background-color: #fff;
   border-radius: 0.5rem;
   box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.1);
@@ -14,16 +18,11 @@ const CardBody = styled.div`
   > *:last-child { margin-bottom: 0; }
 `
 
-type Props = { 
-  children: string | JSX.Element | JSX.Element[] | (() => JSX.Element),
-}
-
-Card.Image = ({ children }: Props) => (
+const CardImage = ({ children }: any) => (
   <div>{children}</div>
 )
 
-Card.Body = ({ children }: Props) => (
-  <CardBody>{children}</CardBody>
-)
+Card.Image = CardImage;
+Card.Body = CardBody;
 
 export default Card
