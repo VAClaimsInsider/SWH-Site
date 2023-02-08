@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import Hero from '../components/Hero';
 import Container from '../components/Container';
 import Logo from '../public/logo.svg'
 
@@ -14,9 +15,12 @@ export default function Foundation() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
+      <Hero
+        title={'Served With Honor Foundation'}
+        bg={'/hero-background.jpg'}
+      />
       <main>
         <Container>
-          <h1>Served With Honor Foundation</h1>
           <Logo width={600} />
           <p>The Served With Honor Foundation is a 501(c)(3) nonprofit organization dedicated to serving those who served. It promotes philanthropy, charity, and volunteerism within the veteran community.</p>
           

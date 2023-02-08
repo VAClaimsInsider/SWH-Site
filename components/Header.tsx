@@ -11,7 +11,7 @@ const StyledHeader = styled.header`
 `
 
 const Wrapper = styled.div`
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   justify-content: space-between;
 `;
@@ -24,6 +24,19 @@ const StyledLogo = styled.div`
   }
 `
 
+const MenuWrapper = styled.div`
+  nav {
+    display: flex;
+    gap: 3rem;
+    font-size: 1.7rem;
+    font-weight: 100;
+    line-height: 1;
+  }
+  a {
+    text-decoration: none;
+  }
+`
+
 export default function Header() {
   return (
     <StyledHeader>
@@ -33,7 +46,7 @@ export default function Header() {
             <LogoBadge width={60} />
             <span>Served With Honor<br />The Veteran Company&trade;</span>
           </StyledLogo>
-          <Menu links={mainMenu} />
+          <MenuWrapper><Menu links={mainMenu} /></MenuWrapper>
         </Wrapper>
       </Container>
     </StyledHeader>

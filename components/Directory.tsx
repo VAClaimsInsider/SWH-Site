@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LayoutGroup, motion } from "framer-motion"
 import styled from 'styled-components'
 import TeamMember from '../components/TeamMember'
-import { ITeamMember } from '../types';
+import { IPerson, IDepartment } from '../types';
 
 const StyledHeading = styled.h2`
   color: var(--primary-color);
@@ -50,20 +50,19 @@ const StyledTeamGrid = styled.div`
   > div > div { height: 100%; }
 `
 
-export default function Directory({ members, departments }: { members: ITeamMember[], departments: string[] }) {
-  const [departmentSelection, setDepartmentSelection] = useState(departments[0]);
+export default function Directory({ members, departments }: { members: IPerson[], departments: IDepartment[] }) {
+  const [departmentSelection, setDepartmentSelection] = useState(departments[0].name);
   const [displayMembers, setDisplayMembers] = useState(members.filter(a => a.department === departmentSelection));
   
   const handleChange = (e: any) => {
     const selection = e.target.value;
+    const matchingDepartment = departments.find(({ name }: IDepartment) => name === selection) || { name: null, director: null };
+    const director = matchingDepartment.director;
     setDepartmentSelection(selection);
-
-    // if (!selection) {
-    //   setDisplayMembers(members);
-    //   return;
-    // }
-
-    const isMatch = ({ department }: ITeamMember) => department === selection;
+    
+    const isMatch = ({ _id, department }: IPerson) => (
+      department === selection || _id === director
+    );
     setDisplayMembers(members.filter(isMatch));
   }
 
@@ -73,7 +72,7 @@ export default function Directory({ members, departments }: { members: ITeamMemb
       <StyledHeading id="toc-heading">Our Team Members</StyledHeading>
       <StyedTabsNav role="tablist">
         {/* <li><button onClick={handleChange} value='' disabled={!departmentSelection}>All</button></li> */}
-      {departments.map((name: string, i: number) => (
+          {departments.map(({ name }: { name: string }, i: number) => (
         <li key={i}>
           <button
             onClick={handleChange}
@@ -87,7 +86,7 @@ export default function Directory({ members, departments }: { members: ITeamMemb
     </nav>
     <StyledTeamGrid>
       <LayoutGroup>
-        {displayMembers.map(({ name, image, position }: ITeamMember, i: number) => {
+        {displayMembers.map(({ name, image, position }: IPerson, i: number) => {
           return <motion.div key={i}
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}

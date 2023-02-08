@@ -3,10 +3,14 @@ require('dotenv').config();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // images: {
-	// 	domains: ['cdn.sanity.io'],
-	// 	loader: 'custom'
-  // },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',        
+      },
+    ],
+  },
   env: {
     SANITY_AUTH_TOKEN: process.env.SANITY_AUTH_TOKEN,
     SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
@@ -15,7 +19,17 @@ const nextConfig = {
 	webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"]
+      use: {
+        loader: '@svgr/webpack',
+        options: {
+          svgoConfig: {
+            plugins: [{
+              name: 'removeViewBox',
+              active: false
+            }]
+          }
+        }
+      }
     });
 
     return config;

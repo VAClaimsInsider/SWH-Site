@@ -1,9 +1,10 @@
-import { useNextSanityImage } from 'next-sanity-image';
+// import { useNextSanityImage } from 'next-sanity-image';
+import imageUrlBuilder from "@sanity/image-url"
 import Image from 'next/image'
 import styled from 'styled-components'
 import Card from '../components/Card'
 import client from '../client'
-import { ITeamMember } from '../types'
+import { IPerson } from '../types'
 import defaultProfile from '../public/default-profile.jpg'
 
 const StyledName = styled.h3`
@@ -16,30 +17,25 @@ const StyledPosition = styled.p`
   font-size: 1.4rem;
   line-height: 1;
 `
+const builder = imageUrlBuilder(client);
 
-const ProfileImage = ({ imageProps, alt = '' }: any) => {
-  console.log(imageProps);
-  return imageProps ?
-    <Image {...imageProps}
-      style={{ width: '100%', height: 'auto' }}
-      sizes="(max-width: 800px) 100vw, 800px"
-      alt={ alt }
-      loader={() => imageProps.src}
-      // placeholder="blur"
-      // blurDataURL={imageProps.asset.metadata.lqip}
-    />
-    : <Image src={defaultProfile} alt={ alt } />
-}
-
-export default function TeamMember({ name, image, position }: ITeamMember) {
-  const imageProps = useNextSanityImage(client, image);
+export default function TeamMember({ name, image, position }: IPerson) {
+  const imageUrl = image ? builder.image(image).size(500, 500).url() : defaultProfile;
   
   return (
-    <Card image={<ProfileImage imageProps={image ? imageProps : null} alt={`Photo of ${name}`} />}>
-      <>
-      <StyledName>{name}</StyledName>
-      {position ? <StyledPosition>{position}</StyledPosition> : ''}
-      </>
+    <Card>
+      <Card.Image>
+        <Image
+          src={imageUrl}
+          alt={`${name} profile photo`}
+          width={500}
+          height={500}
+        />
+      </Card.Image>
+      <Card.Body>
+        <StyledName>{name}</StyledName>
+        {position ? <StyledPosition>{position}</StyledPosition> : ''}
+      </Card.Body>
     </Card>
   );
 }
