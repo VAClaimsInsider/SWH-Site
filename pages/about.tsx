@@ -69,11 +69,6 @@ export default function About({ teamMembers, departments }: { teamMembers: IPers
                 {company.logo}
                 <a href={company.url} target="_blank" rel="noreferrer">
                   <company.logo />
-                    {/* <Image
-                      alt={`${company.name} logo`}
-                      width={500}
-                      height={500}
-                    /> */}
                 </a>
               </li>
             ))}
