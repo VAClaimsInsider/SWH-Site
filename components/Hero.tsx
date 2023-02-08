@@ -1,14 +1,14 @@
-import styled from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 import Container from '../components/Container';
 
-const Wrapper = styled.div`
+const Wrapper: StyledComponentBase<any, {}> = styled.div`
   padding: 10rem 0;
   margin-bottom: 6rem;
   background-color: #333;
   min-height: 50rem;
   display: flex;
   align-items: center;
-  ${({ bg }) => bg ? `
+  ${({ bg }:{ bg?: string }) => bg ? `
     background-image: url(${bg});
     background-size: cover;
   ` : ``}
