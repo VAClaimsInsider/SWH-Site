@@ -90,7 +90,7 @@ export async function getServerSideProps(context: any) {
       _id,
       first_name,
       last_name,
-      prefered_name,
+      preferred_name,
       position,
       "department": department->name,
       image,
@@ -103,7 +103,7 @@ export async function getServerSideProps(context: any) {
     name?: string,
     first_name?: string,
     last_name?: string,
-    prefered_name?: string,
+    preferred_name?: string,
     position?: string,
     department?: string,
     image: any
@@ -112,13 +112,13 @@ export async function getServerSideProps(context: any) {
     name: string,
     director?: { _ref: string }
   }
-  // Modify team members to use prefered name if present
+  // Modify team members to use preferred name if present
   teamMembers = teamMembers.map((person: ISanityTeamMember) => {
-    const name = `${person.prefered_name ? person.prefered_name : person.first_name} ${person.last_name}`
+    const name = `${person.preferred_name ? person.preferred_name : person.first_name} ${person.last_name}`
     person.name = name;
     delete person.first_name;
     delete person.last_name;
-    delete person.prefered_name;
+    delete person.preferred_name;
     return person;
   });
   
