@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  background-color: ${({ alt }: { alt: undefined | boolean }) => alt ? 'var(--primary-color-8)' : 'var(--primary-color-9)'};
+  background-color: ${({ alt }: { alt?: boolean }) => alt ? 'var(--primary-color-8)' : 'var(--primary-color-9)'};
   color: #fff;
   padding: 3rem;
   
