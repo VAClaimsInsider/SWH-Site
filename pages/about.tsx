@@ -119,15 +119,22 @@ export async function getServerSideProps(context: any) {
     delete person.first_name;
     delete person.last_name;
     delete person.preferred_name;
+    if (person.department === 'Coaches' || person.department === 'BDRs') {
+      person.department = 'VA Claims Insider';
+    }
     return person;
   });
   
-  departments = departments.map(
-    ({ name, director }: ISanityDepartment) => ({
+  departments = departments
+    .map(({ name, director }: ISanityDepartment) => ({
       name,
       director: director ? director._ref : null,
-    })
-  );
+    }))
+    .filter(({ name }: { name: string }) => (
+      name !== 'Coaches' && name !== 'BDRs'
+    ))
+    ;
+  departments.push({ name: 'VA Claims Insider' });
   
   return { props: { teamMembers, departments } };
 }

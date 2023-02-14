@@ -71,7 +71,6 @@ export default function Directory({ members, departments }: { members: IPerson[]
     <nav aria-labelledby="toc-heading">
       <StyledHeading id="toc-heading">Our Team Members</StyledHeading>
       <StyedTabsNav role="tablist">
-        {/* <li><button onClick={handleChange} value='' disabled={!departmentSelection}>All</button></li> */}
           {departments.map(({ name }: { name: string }, i: number) => (
         <li key={i}>
           <button
