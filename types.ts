@@ -8,5 +8,5 @@ export interface IPerson {
 
 export interface IDepartment {
   name: string,
-  director?: string,
+  team: IPerson[],
 }

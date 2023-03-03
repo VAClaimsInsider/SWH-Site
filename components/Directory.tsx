@@ -3,6 +3,7 @@ import { LayoutGroup, motion } from "framer-motion"
 import styled from 'styled-components'
 import TeamMember from '../components/TeamMember'
 import { IPerson, IDepartment } from '../types';
+import { slugify } from '../utilities'
 
 const StyledHeading = styled.h2`
   color: var(--primary-color);
@@ -43,27 +44,18 @@ const StyledTeamGrid = styled.div`
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
   }
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
 
   > div > div { height: 100%; }
 `
 
-export default function Directory({ members, departments }: { members: IPerson[], departments: IDepartment[] }) {
-  const [departmentSelection, setDepartmentSelection] = useState(departments[0].name);
-  const [displayMembers, setDisplayMembers] = useState(members.filter(a => a.department === departmentSelection));
+export default function Directory({ data }: { data: IDepartment[] }) {
+  const [selection, setSelection] = useState(data[0]);
   
   const handleChange = (e: any) => {
-    const selection = e.target.value;
-    const matchingDepartment = departments.find(({ name }: IDepartment) => name === selection) || { name: null, director: null };
-    const director = matchingDepartment.director;
-    setDepartmentSelection(selection);
-    
-    const isMatch = ({ _id, department }: IPerson) => (
-      department === selection || _id === director
-    );
-    setDisplayMembers(members.filter(isMatch));
+    const matchingDepartment = data.find(({ name }: IDepartment) => (
+      name === e.target.value
+    ));
+    if (matchingDepartment) setSelection(matchingDepartment);
   }
 
   return (
@@ -71,11 +63,11 @@ export default function Directory({ members, departments }: { members: IPerson[]
     <nav aria-labelledby="toc-heading">
       <StyledHeading id="toc-heading">Our Team Members</StyledHeading>
       <StyedTabsNav role="tablist">
-          {departments.map(({ name }: { name: string }, i: number) => (
+          {data.map(({ name }: { name: string }, i: number) => (
         <li key={i}>
           <button
             onClick={handleChange}
-            disabled={name === departmentSelection}
+            disabled={name === selection.name}
             value={name}
             role="tab"
           >{name}</button>
@@ -85,11 +77,12 @@ export default function Directory({ members, departments }: { members: IPerson[]
     </nav>
     <StyledTeamGrid>
       <LayoutGroup>
-        {displayMembers.map(({ name, image, position }: IPerson, i: number) => {
-          return <motion.div key={i}
+          {selection.team.map(({ name, image, position }: IPerson, i: number) => {
+          const key = slugify(`${selection.name} ${name}`);
+          return <motion.div key={key}
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.025 * i }}
+            transition={{ delay: 0.05 * i }}
           >
             <TeamMember name={name} image={image} position={position} />
           </motion.div>

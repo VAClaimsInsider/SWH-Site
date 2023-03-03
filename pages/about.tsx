@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 import Container from '../components/Container';
 import styled from 'styled-components'
 import client from '../client'
-import { IPerson, IDepartment } from '../types'
+import { IDepartment } from '../types'
 import Hero from '../components/Hero';
 import Directory from '../components/Directory';
 import VACILogo from '../public/logo-vaci.svg'
@@ -35,7 +35,7 @@ const CompaniesWrapper = styled.ul`
   }
 `
 
-export default function About({ teamMembers, departments }: { teamMembers: IPerson[], departments: IDepartment[] }) {
+export default function About({ directoryListing }: { directoryListing: IDepartment[] }) {
   const companies = [
     { name: 'VA Claims Insider', url: 'https://vaclaimsinsider.com/', logo: VACILogo },
     { name: 'Telemedica', url: 'https://telemedicallc.com/', logo: TelemedicaLogo },
@@ -74,7 +74,7 @@ export default function About({ teamMembers, departments }: { teamMembers: IPers
             ))}
           </CompaniesWrapper>
           <DirectoryWrapper>
-            <Directory members={teamMembers} departments={departments} />
+            <Directory data={directoryListing} />
           </DirectoryWrapper>
         </Container>
       </main>
@@ -84,57 +84,77 @@ export default function About({ teamMembers, departments }: { teamMembers: IPers
 }
 
 export async function getServerSideProps(context: any) {
-  // Get all Team Members and list of Departments
-  let { teamMembers, departments } = await client.fetch(`{
-    "teamMembers": *[_type == "teamMember"] | order(orderRank) {
-      _id,
-      first_name,
-      last_name,
-      preferred_name,
-      position,
-      "department": department->name,
-      image,
-    },
-    "departments": *[_type == "department"] | order(orderRank){ name, director }
-  }`);
-  
   interface ISanityTeamMember {
-    _id: string,
     name?: string,
     first_name?: string,
     last_name?: string,
     preferred_name?: string,
     position?: string,
-    department?: string,
     image: any
   }
   interface ISanityDepartment {
     name: string,
-    director?: { _ref: string }
+    director?: ISanityTeamMember,
+    team: ISanityTeamMember[],
   }
-  // Modify team members to use preferred name if present
-  teamMembers = teamMembers.map((person: ISanityTeamMember) => {
+
+  const removeEmptyDepartments = ({ team }: { team: ISanityTeamMember[] }) => team.length > 0;
+  const setPersonName = (person: ISanityTeamMember) => {
     const name = `${person.preferred_name ? person.preferred_name : person.first_name} ${person.last_name}`
     person.name = name;
     delete person.first_name;
     delete person.last_name;
     delete person.preferred_name;
-    if (person.department === 'Coaches' || person.department === 'BDRs') {
-      person.department = 'VA Claims Insider';
-    }
     return person;
-  });
-  
-  departments = departments
-    .map(({ name, director }: ISanityDepartment) => ({
-      name,
-      director: director ? director._ref : null,
-    }))
-    .filter(({ name }: { name: string }) => (
-      name !== 'Coaches' && name !== 'BDRs'
+  }
+  const removeDupPeople = (value: ISanityTeamMember, index: number, self: ISanityTeamMember[]) => (
+    index === self.findIndex((t: ISanityTeamMember) => (
+      t.name === value.name
     ))
-    ;
-  departments.push({ name: 'VA Claims Insider' });
+  );
   
-  return { props: { teamMembers, departments } };
+  const cleanUpDept = (dept: ISanityDepartment) => {
+    if (dept.director) {
+      dept.team.unshift(dept.director);
+      delete dept.director;
+    }
+    dept.team = dept.team
+      .map(setPersonName)
+      .filter((person: ISanityTeamMember) => dept.director ? person.name !== dept.director.name : true)
+      .filter(removeDupPeople);
+    ;
+    return dept;
+  }
+
+  // Get all Team Members and list of Departments
+  const teamFields = `{
+    first_name,
+    last_name,
+    preferred_name,
+    // 'testname': first_name + " " + last_name,
+    position,
+    image,
+  }`;
+  const teamQuery = `
+    *[
+      _type=='teamMember'
+      && 'Served with Honor' in entity[]
+      && department._ref == ^._id
+    ] | order(orderRank) ${teamFields}
+  `;
+  const query = `
+    *[_type == "department"] | order(orderRank asc){
+      name,
+      director->${teamFields},
+      "team": ${teamQuery}
+    }
+  `;
+
+  const data = await client.fetch(query);
+  const directoryListing = data
+    .filter(removeEmptyDepartments)
+    .map(cleanUpDept)
+  ;
+  
+  return { props: { directoryListing } };
 }
