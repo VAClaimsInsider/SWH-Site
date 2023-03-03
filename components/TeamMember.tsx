@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import Card from '../components/Card'
 import client from '../client'
 import { IPerson } from '../types'
-import defaultProfile from '../public/default-profile.jpg'
+import defaultProfile from '../public/default-profile.png'
 
 const StyledName = styled.h3`
   margin-bottom: 0;
